@@ -1,1 +1,4 @@
-Output: 8
+Data Overflow/Underflow @ 1, result will be truncated...
+Data Overflow/Underflow @ 2, result will be truncated
+Data Overflow/Underflow @ 4, result will be truncated
+Output: 18
