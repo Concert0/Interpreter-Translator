@@ -132,14 +132,30 @@ def LT(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     return data_memory,program_counter,input_pointer
 ##Operations being tested
 
+def ITJP(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
+    data_memory[opn1] += 1
+    if(data_memory[opn1]<data_memory[opn2]):
+        program_counter = opn3
+    else:
+        program_counter +=1
+    return data_memory,program_counter,input_pointer
+
+def STOP(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
+    sys.exit()
 
 
+def RDAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
+    data_memory[opn3] = data_memory[opn1+data_memory[opn2]]
+    return data_memory,program_counter,input_pointer
+
+def RDAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
+    data_memory[opn3] = data_memory[opn1+data_memory[opn2]]
+    return data_memory,program_counter,input_pointer
 
 
-
-
-
-
+def WTAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
+    data_memory[opn2+data_memory[opn3]] = data_memory[opn1]
+    return data_memory,program_counter,input_pointer
 
 
 if __name__ == "__main__":
@@ -148,12 +164,11 @@ if __name__ == "__main__":
     program_memory = []
     memory_dict = {0: data_memory, 1: program_memory, 2: input_memory}
     memory_status = 0
-    # operations_dict = {0: ASGN, 1: ADD, -1: SUB, 2: MULT, -2: DIV, 3: SQR, -3: SQRT, 4: EQL, -4: NEQ, 5: GTEQ, -5: LT, 6:RDAR, -6:WTAR, 7:ITJP, -7:label, 8:READ, -8:WRIT, 9:STOP}
-    operations_dict = {0: ASGN, 1: ADD, -1: SUB, 2: MULT,-2: DIV, 3: SQR, -3: SQRT,4: EQL, -4: NEQ, 5: GTEQ, -5: LT, 7:ITJP, 8:READ, -8:WRIT}
+    operations_dict = {0: ASGN, 1: ADD, -1: SUB, 2: MULT,-2: DIV, 3: SQR, -3: SQRT,4: EQL, -4: NEQ, 5: GTEQ, -5: LT, 6:RDAR, -6:WTAR, 7:ITJP, 8:READ, -8:WRIT, 9:STOP}
     counter = 0
     program_counter = 0
     input_pointer = 0
-    with open('test1.txt') as f:
+    with open('input.txt') as f:
         for line in f:
             counter += 1
             int_line = clean_line(line)
@@ -165,8 +180,12 @@ if __name__ == "__main__":
                 memory_dict[memory_status].append(int_line)
             else:
                 sys.exit('You have not respected the machine\'s specifications')
+    #fill the rest of data memory with 0s
+    while(len(data_memory)<1000):
+        data_memory.append(0)
 
     while(True):
+        # print(data_memory)
         op, opn1, opn2, opn3 = parse_operation(program_memory[program_counter])
         # print("{}  {}  {}  {}".format(op, opn1, opn2, opn3))
         if(op in operations_dict):
@@ -174,7 +193,7 @@ if __name__ == "__main__":
         else:
             print('operation doesn\'t exist @ {} {}'.format(program_counter, op))
             sys.exit()
-        if(op in [4,-4,5,-5,7]): # in case of branching, continue so the program counter is not incremented
+        if(op in [4,-4,5,-5]): # in case of branching, continue so the program counter is not incremented
             continue
         program_counter += 1
         if program_counter == len(program_memory):
