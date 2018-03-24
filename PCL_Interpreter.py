@@ -147,9 +147,6 @@ def RDAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     data_memory[opn3] = data_memory[opn1+data_memory[opn2]]
     return data_memory,program_counter,input_pointer
 
-def RDAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
-    data_memory[opn3] = data_memory[opn1+data_memory[opn2]]
-    return data_memory,program_counter,input_pointer
 
 
 def WTAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):

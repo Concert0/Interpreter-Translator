@@ -75,17 +75,14 @@ def READ(opn1,opn2,opn3,program_counter,input_pointer):
     return program_counter,input_pointer
 
 def WRIT(opn1,opn2,opn3,program_counter,input_pointer):
-    print("Output: {}".format(symbol_table[opn1]))
+    opn1 = symbol_or_variable(opn1)
+    print("Output: {}".format(opn1))
     return program_counter,input_pointer
 
 def ASGN(opn1,opn2,opn3,program_counter,input_pointer):
     opn1 = symbol_or_variable(opn1)
     symbol_table[opn3] = opn1
     return program_counter,input_pointer
-
-#functions being tested
-
-
 
 def MULT(opn1,opn2,opn3,program_counter,input_pointer):
     opn1 = symbol_or_variable(opn1)
@@ -127,6 +124,78 @@ def SQRT(opn1,opn2,opn3,program_counter,input_pointer):
     Sqrt = round(Sqrt)
     symbol_table[opn3] = Sqrt
     return program_counter,input_pointer
+
+
+def EQL(opn1,opn2,opn3,program_counter,input_pointer):
+    opn1 = symbol_or_variable(opn1)
+    opn2 = symbol_or_variable(opn2)
+    if(opn1==opn2):
+        program_counter = label_table[opn3]
+    else:
+        program_counter +=1
+    return program_counter,input_pointer
+
+def NEQ(opn1,opn2,opn3,program_counter,input_pointer):
+    opn1 = symbol_or_variable(opn1)
+    opn2 = symbol_or_variable(opn2)
+    if(opn1!=opn2):
+        program_counter = label_table[opn3]
+    else:
+        program_counter +=1
+    return program_counter,input_pointer
+
+def GTEQ(opn1,opn2,opn3,program_counter,input_pointer):
+    opn1 = symbol_or_variable(opn1)
+    opn2 = symbol_or_variable(opn2)
+    if(opn1>=opn2):
+        program_counter = label_table[opn3]
+    else:
+        program_counter +=1
+    return program_counter,input_pointer
+
+def LT(opn1,opn2,opn3,program_counter,input_pointer):
+    opn1 = symbol_or_variable(opn1)
+    opn2 = symbol_or_variable(opn2)
+    if(opn1<opn2):
+        program_counter = label_table[opn3]
+    else:
+        program_counter +=1
+    return program_counter,input_pointer
+
+def ITJP(opn1,opn2,opn3,program_counter,input_pointer):
+    #handles symbols only when it comes to the index because
+    #updating a constant doesn't sound useful at all(infinite loop?)
+    symbol_table[opn1] += 1
+    opn1 = symbol_table[opn1]
+    opn2 = symbol_or_variable(opn2)
+    if(opn1<opn2):
+        program_counter = label_table[opn3]
+    else:
+        program_counter +=1
+    return program_counter,input_pointer
+
+
+def STOP(opn1,opn2,opn3,program_counter,input_pointer):
+    print("System Stopped")
+    sys.exit()
+
+#functions being tested
+
+def RDAR(opn1,opn2,opn3,program_counter,input_pointer):
+    opn2 = symbol_or_variable(opn2)
+    symbol_table[opn3] = symbol_table[opn1][opn2]
+    return program_counter,input_pointer
+
+
+
+def WTAR(opn1,opn2,opn3,program_counter,input_pointer):
+    opn3 = symbol_or_variable(opn3)
+    symbol_table[opn2][opn3]=symbol_table[opn1]
+    return program_counter,input_pointer
+
+
+
+
 
 if __name__ == "__main__":
     # sys.stdout = open('output.txt', 'w')
@@ -188,13 +257,15 @@ if __name__ == "__main__":
 
 
 
-    # operations_dict = {'ASGN': ASGN, 'ADD': ADD, 'SUB': SUB, 'MULT': MULT, 'DIV': DIV, 'SQR': SQR, 'SQRT': SQRT, 'EQL': EQL, 'NEQ': NEQ, 'GTEQ': GTEQ, 'LT': LT, 'RDAR':RDAR, 'WTAR':WTAR, 'ITJP':ITJP, 'READ':READ, 'WRIT':WRIT, 'STOP':STOP}
-    operations_dict = {'ASGN': ASGN, 'ADD': ADD, 'SUB': SUB, 'MULT': MULT, 'DIV': DIV, 'SQR': SQR, 'SQRT': SQRT,'READ':READ, 'WRIT':WRIT}
+    operations_dict = {'ASGN': ASGN, 'ADD': ADD, 'SUB': SUB, 'MULT': MULT, 'DIV': DIV, 'SQR': SQR, 'SQRT': SQRT, 'EQL': EQL, 'NEQ': NEQ, 'GTEQ': GTEQ, 'LT': LT, 'RDAR':RDAR, 'WTAR':WTAR, 'ITJP':ITJP, 'READ':READ, 'WRIT':WRIT, 'STOP':STOP}
+
 
 
     #Here we get started with program_memory
     program_counter = 0
     while(True):
+        if program_counter >= (len(program_memory)):
+            break
         op, opn1, opn2, opn3 = parse_operation(program_memory[program_counter])
         # print("{}   {}   {}   {}".format(op, opn1, opn2, opn3))
         if(op in operations_dict):
@@ -205,8 +276,6 @@ if __name__ == "__main__":
         if(op in ['EQL', 'NEQ', 'GTEQ', 'LT', 'ITJP']): # in case of branching, continue so the program counter is not incremented
             continue
         program_counter += 1
-        if program_counter == len(program_memory):
-            break
 
 
 
