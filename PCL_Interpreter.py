@@ -43,15 +43,15 @@ def ASGN(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
 
 def READ(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     if(input_pointer>=len(input_memory)):
-        print("No input left to read")
+        print("Error: No input left to read @{}".format(program_counter))
+        sys.exit()
     elif(abs(input_memory[input_pointer])>9999999999):
         print("Data Overflow/Underflow @ {}, result will be truncated...".format(program_counter))
         read_input = truncate(input_memory[input_pointer])
         data_memory[opn3] = read_input
-        input_pointer += 1
     else:
         data_memory[opn3] = input_memory[input_pointer]
-        input_pointer += 1
+    input_pointer += 1
     return data_memory,program_counter,input_pointer
 
 def WRIT(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
@@ -130,7 +130,6 @@ def LT(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     else:
         program_counter +=1
     return data_memory,program_counter,input_pointer
-##Operations being tested
 
 def ITJP(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     data_memory[opn1] += 1
@@ -156,6 +155,9 @@ def RDAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
 def WTAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     data_memory[opn2+data_memory[opn3]] = data_memory[opn1]
     return data_memory,program_counter,input_pointer
+
+##Operations being tested
+
 
 
 if __name__ == "__main__":
@@ -193,7 +195,7 @@ if __name__ == "__main__":
         else:
             print('operation doesn\'t exist @ {} {}'.format(program_counter, op))
             sys.exit()
-        if(op in [4,-4,5,-5]): # in case of branching, continue so the program counter is not incremented
+        if(op in [4,-4,5,-5,7]): # in case of branching, continue so the program counter is not incremented
             continue
         program_counter += 1
         if program_counter == len(program_memory):

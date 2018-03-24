@@ -1,2 +1,222 @@
 #AL Interpreter
 #Python 3.6.4
+import sys
+import math
+input_memory = []
+label_table={}
+symbol_table={}
+#Check the syntax for label, operands (2 places, parse_operation, label table)
+#by creating a function that does it
+def truncate(variable):
+    ## In this function we only keep track of the 10 right digits
+    ## 9999999999 + 1 would lead to 10000000000 which is a 0
+    ## This won't be handled as the user should not enter such values
+    ## So an overflow won't lead to an error but a wrong output
+    trunc = 1
+    if variable < 0:
+        trunc = -1
+    variable = trunc*(abs(variable)%(10**10))
+    return variable
+
+def symbol_or_variable(opn):
+    if opn.isnumeric():
+        return int(opn)
+    else:
+        if opn in symbol_table:
+            return int(symbol_table[opn])
+        else:
+            print("{} was not defined".format(opn))
+
+def clean_line(line):
+    line  = ''.join(line.split())
+    return str(line)
+
+def parse_operation(operation):
+    op = str(operation[5:9]).rstrip()
+    opn1 = str(operation[10:14]).rstrip()
+    opn2 = str(operation[15:19]).rstrip()
+    opn3 = str(operation[20:24]).rstrip()
+    return op,opn1,opn2,opn3
+
+#functions tested
+def ADD(opn1,opn2,opn3,program_counter,input_pointer):
+    opn1 = symbol_or_variable(opn1)
+    opn2 = symbol_or_variable(opn2)
+    Sum = opn1 + opn2
+    if abs(Sum) > 9999999999:
+        print("Data Overflow/Underflow @ {}, result will be truncated...".format(program_counter))
+        Sum = truncate(Sum)
+    Sum = round(Sum)
+    symbol_table[opn3] = Sum
+    return program_counter,input_pointer
+
+def SUB(opn1,opn2,opn3,program_counter,input_pointer):
+    opn1 = symbol_or_variable(opn1)
+    opn2 = symbol_or_variable(opn2)
+    sub = opn1 - opn2
+    if abs(sub) > 9999999999:
+        print("Data Overflow/Underflow @ {}, result will be truncated...".format(program_counter))
+        sub = truncate(sub)
+    sub = round(sub)
+    symbol_table[opn3] = sub
+    return program_counter,input_pointer
+
+def READ(opn1,opn2,opn3,program_counter,input_pointer):
+    if(input_pointer>=len(input_memory)):
+        print("Error: No input left to read @{}".format(program_counter))
+        sys.exit()
+    elif(abs(int(input_memory[input_pointer]))>9999999999):
+        print("Data Overflow/Underflow @ {}, result will be truncated...".format(program_counter))
+        read_input = truncate(input_memory[input_pointer])
+        symbol_table[opn3] = read_input
+    else:
+        symbol_table[opn3] = input_memory[input_pointer]
+    input_pointer += 1
+    return program_counter,input_pointer
+
+def WRIT(opn1,opn2,opn3,program_counter,input_pointer):
+    print("Output: {}".format(symbol_table[opn1]))
+    return program_counter,input_pointer
+
+def ASGN(opn1,opn2,opn3,program_counter,input_pointer):
+    opn1 = symbol_or_variable(opn1)
+    symbol_table[opn3] = opn1
+    return program_counter,input_pointer
+
+#functions being tested
+
+
+
+def MULT(opn1,opn2,opn3,program_counter,input_pointer):
+    opn1 = symbol_or_variable(opn1)
+    opn2 = symbol_or_variable(opn2)
+    print("{}  {}".format(opn1,opn2))
+    mult = opn1 * opn2
+    if abs(mult) > 9999999999:
+        print("Data Overflow/Underflow @ {}, result will be truncated...".format(program_counter))
+        mult = truncate(mult)
+    mult = round(mult)
+    symbol_table[opn3] = mult
+    return program_counter,input_pointer
+
+def DIV(opn1,opn2,opn3,program_counter,input_pointer):
+    opn1 = symbol_or_variable(opn1)
+    opn2 = symbol_or_variable(opn2)
+    div = opn1/opn2
+    if abs(div) > 9999999999:
+        print("Data Overflow/Underflow @ {}, result will be truncated...".format(program_counter))
+        div = truncate(div)
+    div = round(div)
+    symbol_table[opn3] = div
+    return program_counter,input_pointer
+
+def SQR(opn1,opn2,opn3,program_counter,input_pointer):
+    sqr = symbol_or_variable(opn1)**2
+    if abs(sqr) > 9999999999:
+        print("Data Overflow/Underflow @ {}, result will be truncated...".format(program_counter))
+        sqr = truncate(sqr)
+    sqr = round(sqr)
+    symbol_table[opn3] = sqr
+    return program_counter,input_pointer
+
+def SQRT(opn1,opn2,opn3,program_counter,input_pointer):
+    Sqrt = math.sqrt(symbol_or_variable(opn1))
+    if abs(Sqrt) > 9999999999:
+        print("Data Overflow/Underflow @ {}, result will be truncated...".format(program_counter))
+        Sqrt = truncate(Sqrt)
+    Sqrt = round(Sqrt)
+    symbol_table[opn3] = Sqrt
+    return program_counter,input_pointer
+
+if __name__ == "__main__":
+    # sys.stdout = open('output.txt', 'w')
+    data_memory = []
+    program_memory = []
+    memory_dict = {0: data_memory, 1: program_memory, 2: input_memory}
+    memory_status = 0
+    counter = 0
+    flag = 0
+    data_declarated_size =0
+    program_counter = 0
+    input_pointer = 0
+    with open('test1A.txt') as f:
+        for line in f:
+            counter += 1
+            #the next 2 lines handle comments
+            if(line.lstrip()[:1]=='*'):
+                continue
+            if(counter < 1000):
+                if (line[:4]!="INT " and flag == 0):
+                    flag += 1
+                    memory_status += 1
+                    counter = 0
+                elif(clean_line(line).isnumeric() and flag == 1):
+                    flag +=1
+                    memory_status += 1
+                    counter = 0
+                memory_dict[memory_status].append(line.rstrip())
+            else:
+                sys.exit('You have not respected the machine\'s specifications')
+
+
+    #Treating Data Declarations:
+    #we will save the variables into an array to make their access and modification easy.
+    #We assume that INT variables can be instanciated but Arrays can not
+    for line in data_memory:
+        data_declarated_size += int(line[10:14])
+        if data_declarated_size<=1000:
+            if int(line[10:14])==1:
+                symbol_table[str(line[5:9].rstrip())]=int(line[15:26].rstrip())
+            else:
+                listofzeros = [0] * int(line[10:14])
+                symbol_table[str(line[5:9].rstrip())]= list(listofzeros)
+        else:
+            print("Machine restrictions were not respected. {} variables declared".format(data_declarated_size))
+            sys.exit()
+    # print(symbol_table)
+
+
+
+
+    ##Looking for labels and adding them to the label table
+    for line in program_memory:
+        if line[0:4]!='    ':
+            label_table[str(line[0:4]).rstrip()]=program_counter
+        program_counter += 1
+    # print(label_table)
+
+
+
+
+    # operations_dict = {'ASGN': ASGN, 'ADD': ADD, 'SUB': SUB, 'MULT': MULT, 'DIV': DIV, 'SQR': SQR, 'SQRT': SQRT, 'EQL': EQL, 'NEQ': NEQ, 'GTEQ': GTEQ, 'LT': LT, 'RDAR':RDAR, 'WTAR':WTAR, 'ITJP':ITJP, 'READ':READ, 'WRIT':WRIT, 'STOP':STOP}
+    operations_dict = {'ASGN': ASGN, 'ADD': ADD, 'SUB': SUB, 'MULT': MULT, 'DIV': DIV, 'SQR': SQR, 'SQRT': SQRT,'READ':READ, 'WRIT':WRIT}
+
+
+    #Here we get started with program_memory
+    program_counter = 0
+    while(True):
+        op, opn1, opn2, opn3 = parse_operation(program_memory[program_counter])
+        # print("{}   {}   {}   {}".format(op, opn1, opn2, opn3))
+        if(op in operations_dict):
+            program_counter,input_pointer = operations_dict[op](opn1,opn2,opn3,program_counter,input_pointer)
+        else:
+            print('operation doesn\'t exist @ {} {}'.format(program_counter, op))
+            sys.exit()
+        if(op in ['EQL', 'NEQ', 'GTEQ', 'LT', 'ITJP']): # in case of branching, continue so the program counter is not incremented
+            continue
+        program_counter += 1
+        if program_counter == len(program_memory):
+            break
+
+
+
+
+
+    # for x in data_memory:
+    #     print(x)
+    # print('#######')
+    # for x in program_memory:
+    #     print(x)
+    # print('#######')
+    # for x in input_memory:
+    #     print(x)
