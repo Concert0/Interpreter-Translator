@@ -7,6 +7,21 @@ label_table={}
 symbol_table={}
 #Check the syntax for label, operands (2 places, parse_operation, label table)
 #by creating a function that does it
+
+def VerifySyntax_LBL(token):
+    if token.isalnum() and token.isupper() and token[0].isalpha():
+        return
+    else:
+        print('Error: Wrong Syntax {}. Check Documentation'.format(token))
+        sys.exit()
+
+def VerifySyntax_OPD(token):
+    if( token.isalnum() and token.isupper() and token[0].isalpha()) or token.isnumeric():
+        return
+    else:
+        print('Error: Wrong Syntax {}. Check Documentation'.format(token))
+        sys.exit()
+
 def truncate(variable):
     ## In this function we only keep track of the 10 right digits
     ## 9999999999 + 1 would lead to 10000000000 which is a 0
@@ -33,9 +48,13 @@ def clean_line(line):
 
 def parse_operation(operation):
     op = str(operation[5:9]).rstrip()
+    VerifySyntax_LBL(op)
     opn1 = str(operation[10:14]).rstrip()
     opn2 = str(operation[15:19]).rstrip()
     opn3 = str(operation[20:24]).rstrip()
+    VerifySyntax_OPD(opn1)
+    VerifySyntax_OPD(opn2)
+    VerifySyntax_OPD(opn3)
     return op,opn1,opn2,opn3
 
 #functions tested
@@ -208,11 +227,11 @@ if __name__ == "__main__":
     data_declarated_size =0
     program_counter = 0
     input_pointer = 0
-    with open('test1A.txt') as f:
+    with open('test2A.txt') as f:
         for line in f:
             counter += 1
             #the next 2 lines handle comments
-            if(line.lstrip()[:1]=='*'):
+            if(line.lstrip()[:1]=='*' or len(line.strip()) == 0):
                 continue
             if(counter < 1000):
                 if (line[:4]!="INT " and flag == 0):
@@ -250,6 +269,7 @@ if __name__ == "__main__":
     ##Looking for labels and adding them to the label table
     for line in program_memory:
         if line[0:4]!='    ':
+            VerifySyntax_LBL(str(line[0:4]).rstrip())
             label_table[str(line[0:4]).rstrip()]=program_counter
         program_counter += 1
     # print(label_table)

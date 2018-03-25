@@ -167,7 +167,7 @@ if __name__ == "__main__":
     counter = 0
     program_counter = 0
     input_pointer = 0
-    with open('input.txt') as f:
+    with open('al2pcl.txt') as f:
         for line in f:
             counter += 1
             int_line = clean_line(line)
