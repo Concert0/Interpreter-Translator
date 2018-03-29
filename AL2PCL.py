@@ -36,7 +36,7 @@ if __name__ == "__main__":
     data_declarated_size =0
     program_counter = 0
     input_pointer = 0
-    with open('test2A.txt') as f:
+    with open('tested/tested1.txt') as f:
         for line in f:
             counter += 1
             #the next 2 lines handle comments
@@ -57,7 +57,6 @@ if __name__ == "__main__":
 
 
     #Treating Data Declarations:
-    PCL_PROGRAM_MEMORY = []
     counter = 0
     for line in data_memory:
         if int(line[10:14])==1:

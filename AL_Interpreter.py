@@ -5,18 +5,17 @@ import math
 input_memory = []
 label_table={}
 symbol_table={}
-#Check the syntax for label, operands (2 places, parse_operation, label table)
-#by creating a function that does it
 
+#function to Check the syntax of the labels
 def VerifySyntax_LBL(token):
     if token.isalnum() and token.isupper() and token[0].isalpha():
         return
     else:
         print('Error: Wrong Syntax {}. Check Documentation'.format(token))
         sys.exit()
-
+#function to Check
 def VerifySyntax_OPD(token):
-    if( token.isalnum() and token.isupper() and token[0].isalpha()) or token.isnumeric():
+    if( token.isalnum() and token.isupper() and token[0].isalpha()) or token.isnumeric() or (token[:1]=='-' and token[1:].isnumeric()):
         return
     else:
         print('Error: Wrong Syntax {}. Check Documentation'.format(token))
@@ -34,7 +33,7 @@ def truncate(variable):
     return variable
 
 def symbol_or_variable(opn):
-    if opn.isnumeric():
+    if opn.isnumeric() or (opn[:1]=='-' and opn[1:].isnumeric()):
         return int(opn)
     else:
         if opn in symbol_table:
@@ -227,7 +226,7 @@ if __name__ == "__main__":
     data_declarated_size =0
     program_counter = 0
     input_pointer = 0
-    with open('test2A.txt') as f:
+    with open('X') as f:
         for line in f:
             counter += 1
             #the next 2 lines handle comments
