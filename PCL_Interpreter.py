@@ -180,7 +180,8 @@ if __name__ == "__main__":
             else:
                 sys.exit('You have not respected the machine\'s specifications')
     #fill the rest of data memory with 0s
-    while(len(data_memory)<1000):
+    # print(data_memory)
+    while(len(data_memory)<=1000):
         data_memory.append(0)
 
     while(True):

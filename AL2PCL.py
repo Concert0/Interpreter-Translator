@@ -4,7 +4,8 @@ import sys
 input_memory=[]
 symbol_table={}
 label_table = {}
-
+data_declarated_size =0
+symbols_and_constants_values = []
 def clean_line(line):
     line  = ''.join(line.split())
     return str(line)
@@ -17,8 +18,15 @@ def parse_operation(operation):
     return op,opn1,opn2,opn3
 
 def symbol_or_variable(opn):
-    if opn.isnumeric():
-        return "{0:0>3}".format(int(opn))
+    temp = 0
+    if opn.isnumeric() or (opn[:1]=='-' and opn[1:].isnumeric()):
+        if(int(opn) not in symbols_and_constants_values[data_declarated_size:]):
+            symbols_and_constants_values.append(int(opn))
+            temp = len(symbols_and_constants_values)-1
+        else:
+            temp = symbols_and_constants_values[data_declarated_size:].index(int(opn)) + data_declarated_size
+
+        return "{0:0>3}".format(temp)
     else:
         if opn in symbol_table:
             return symbol_table[opn]
@@ -26,6 +34,7 @@ def symbol_or_variable(opn):
             print("{} was not defined".format(opn))
 
 if __name__ == "__main__":
+# def main():
     sys.stdout = open('al2pcl.txt', 'w')
     data_memory = []
     program_memory = []
@@ -33,10 +42,9 @@ if __name__ == "__main__":
     memory_status = 0
     counter = 0
     flag = 0
-    data_declarated_size =0
     program_counter = 0
     input_pointer = 0
-    with open('tested/tested1.txt') as f:
+    with open('tested/tested4.txt') as f:
         for line in f:
             counter += 1
             #the next 2 lines handle comments
@@ -56,16 +64,25 @@ if __name__ == "__main__":
                 sys.exit('You have not respected the machine\'s specifications')
 
 
+
     #Treating Data Declarations:
     counter = 0
     for line in data_memory:
         if int(line[10:14])==1:
             symbol_table[str(line[5:9].rstrip())]= "{0:0>3}".format(counter)
+            temp = 0
+            if(line[15:26].rstrip()!=''):
+                temp = int(line[15:26].rstrip())
+            symbols_and_constants_values.append(temp)
             counter += 1
             print('+0 000 000 000')
         else:
             symbol_table[str(line[5:9].rstrip())]= "{0:0>3}".format(counter)
             for i in range(int(line[10:14])):
+                #Assumption that all arrays' elements are initialized to 0
+                #Assumption based on all the examples we've seen so far
+                counter+= 1
+                symbols_and_constants_values.append(0)
                 print('+0 000 000 000')
 
         if data_declarated_size>1000:
@@ -97,6 +114,7 @@ if __name__ == "__main__":
         if program_counter >= (len(program_memory)):
             break
         op, opn1, opn2, opn3 = parse_operation(program_memory[program_counter])
+        # print("{}   {}   {}   {}".format(op, opn1, opn2, opn3))
         if(op in ['ASGN', 'ADD', 'SUB', 'MULT', 'DIV', 'SQR', 'SQRT','RDAR', 'WTAR', 'READ', 'WRIT', 'STOP']):
             pcl_command = operations_dict[op] + ' ' + symbol_or_variable(opn1) +  ' ' + symbol_or_variable(opn2) + ' ' + symbol_or_variable(opn3)
             print(pcl_command)
@@ -115,3 +133,5 @@ if __name__ == "__main__":
     print("+9 999 999 999")
     for i in input_memory:
         print(i)
+    # print(symbols_and_constants_values)
+# Find all numbers, Add Them to Data Memory & const_dictionary, Add reads in the beginning of program memory

@@ -226,7 +226,7 @@ if __name__ == "__main__":
     data_declarated_size =0
     program_counter = 0
     input_pointer = 0
-    with open('X') as f:
+    with open('tested/tested4.txt') as f:
         for line in f:
             counter += 1
             #the next 2 lines handle comments
@@ -253,7 +253,10 @@ if __name__ == "__main__":
         data_declarated_size += int(line[10:14])
         if data_declarated_size<=1000:
             if int(line[10:14])==1:
-                symbol_table[str(line[5:9].rstrip())]=int(line[15:26].rstrip())
+                temp = 0
+                if(line[15:26].rstrip()!=''):
+                    temp = int(line[15:26].rstrip())
+                symbol_table[str(line[5:9].rstrip())]=temp
             else:
                 listofzeros = [0] * int(line[10:14])
                 symbol_table[str(line[5:9].rstrip())]= list(listofzeros)
@@ -295,6 +298,8 @@ if __name__ == "__main__":
         if(op in ['EQL', 'NEQ', 'GTEQ', 'LT', 'ITJP']): # in case of branching, continue so the program counter is not incremented
             continue
         program_counter += 1
+
+
 
 
 
