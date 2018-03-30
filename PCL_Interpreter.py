@@ -1,9 +1,10 @@
 #PCL Interpreter
 #Python 3.6.4
-#This program does not handle floating point operations
 import sys
 import math
 input_memory = []
+
+#function to format the lines by removing spaces
 def clean_line(line):
     line  = ''.join(line.split())
     return int(line)
@@ -19,6 +20,7 @@ def truncate(variable):
     variable = trunc*(abs(variable)%(10**10))
     return variable
 
+#function that takes a full operation then returns the tokens
 def parse_operation(operation):
     op = math.floor(abs(operation)/(10**9))
     if(operation<0):
@@ -27,7 +29,9 @@ def parse_operation(operation):
     opn2 = math.floor(abs(operation)/(10**3)) % (10**3)
     opn3 = abs(operation) % (10**3)
     return op,opn1,opn2,opn3
-##Operations tested
+
+##instruction Set
+#I have given the functions their name in AL in both AL and PCL interpreters to make it easy to remember them
 def ADD(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     Sum = data_memory[opn1] + data_memory[opn2]
     if abs(Sum) > 9999999999:
@@ -142,23 +146,16 @@ def ITJP(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
 def STOP(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     sys.exit()
 
-
 def RDAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     data_memory[opn3] = data_memory[opn1+data_memory[opn2]]
     return data_memory,program_counter,input_pointer
-
-
 
 def WTAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     data_memory[opn2+data_memory[opn3]] = data_memory[opn1]
     return data_memory,program_counter,input_pointer
 
-##Operations being tested
-
-
-
 if __name__ == "__main__":
-    # sys.stdout = open('output.txt', 'w')
+    sys.stdout = open('outputPCL.txt', 'w')
     data_memory = []
     program_memory = []
     memory_dict = {0: data_memory, 1: program_memory, 2: input_memory}
@@ -167,6 +164,8 @@ if __name__ == "__main__":
     counter = 0
     program_counter = 0
     input_pointer = 0
+
+    #Open Code in PCL and interpret it
     with open('al2pcl.txt') as f:
         for line in f:
             counter += 1
@@ -179,15 +178,14 @@ if __name__ == "__main__":
                 memory_dict[memory_status].append(int_line)
             else:
                 sys.exit('You have not respected the machine\'s specifications')
+
     #fill the rest of data memory with 0s
-    # print(data_memory)
     while(len(data_memory)<=1000):
         data_memory.append(0)
 
+#Execute the instructions
     while(True):
-        # print(data_memory)
         op, opn1, opn2, opn3 = parse_operation(program_memory[program_counter])
-        # print("{}  {}  {}  {}".format(op, opn1, opn2, opn3))
         if(op in operations_dict):
             data_memory,program_counter,input_pointer = operations_dict[op](data_memory,opn1,opn2,opn3,program_counter,input_pointer)
         else:
@@ -198,14 +196,3 @@ if __name__ == "__main__":
         program_counter += 1
         if program_counter == len(program_memory):
             break
-    # print(data_memory)
-
-
-    # for x in data_memory:
-    #     print(x)
-    # print('#######')
-    # for x in program_memory:
-    #     print(x)
-    # print('#######')
-    # for x in input_memory:
-    #     print(x)

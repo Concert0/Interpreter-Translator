@@ -4,12 +4,15 @@ import sys
 input_memory=[]
 symbol_table={}
 label_table = {}
-data_declarated_size =0
+data_declarated_size = 0
 symbols_and_constants_values = []
+
+#function to format the lines by removing spaces
 def clean_line(line):
     line  = ''.join(line.split())
     return str(line)
 
+#function that takes a full operation then returns the tokens
 def parse_operation(operation):
     op = str(operation[5:9]).rstrip()
     opn1 = str(operation[10:14]).rstrip()
@@ -17,6 +20,9 @@ def parse_operation(operation):
     opn3 = str(operation[20:24]).rstrip()
     return op,opn1,opn2,opn3
 
+#function that returns value from either a numeric or a symbol
+#it also adds the constants to a list so that they are sent during the 'compilation' to the PCL_Interpreter
+#It is optimized in the sense that it only adds a constant once to the list then each time we run through the same constant we get its address. If it doesn't exist, I create it
 def symbol_or_variable(opn):
     temp = 0
     if opn.isnumeric() or (opn[:1]=='-' and opn[1:].isnumeric()):
@@ -33,8 +39,8 @@ def symbol_or_variable(opn):
         else:
             print("{} was not defined".format(opn))
 
+
 if __name__ == "__main__":
-# def main():
     sys.stdout = open('al2pcl.txt', 'w')
     data_memory = []
     program_memory = []
@@ -44,6 +50,8 @@ if __name__ == "__main__":
     flag = 0
     program_counter = 0
     input_pointer = 0
+
+    #Getting data_memory, program_memory and input_memory
     with open('tested/tested4.txt') as f:
         for line in f:
             counter += 1
@@ -63,9 +71,7 @@ if __name__ == "__main__":
             else:
                 sys.exit('You have not respected the machine\'s specifications')
 
-
-
-    #Treating Data Declarations:
+    #Treating Data Declarations(arrays & single variables):
     counter = 0
     for line in data_memory:
         if int(line[10:14])==1:
@@ -84,12 +90,11 @@ if __name__ == "__main__":
                 counter+= 1
                 symbols_and_constants_values.append(0)
                 print('+0 000 000 000')
-
+#Always check if the machine restrictions are respected, 1000 words for data and another 1000 words for program
         if data_declarated_size>1000:
             print("Machine restrictions were not respected. {} variables declared".format(data_declarated_size))
             sys.exit()
         data_declarated_size += int(line[10:14])
-    # print(symbol_table)
     print("+9 999 999 999")
 
 
@@ -98,23 +103,17 @@ if __name__ == "__main__":
         if line[0:4]!='    ':
             label_table[str(line[0:4]).rstrip()]="{0:0>3}".format(program_counter)
         program_counter += 1
-    # print(label_table)
-
-
-
-
 
     operations_dict = {'ASGN': '+0', 'ADD': '+1', 'SUB': '-1', 'MULT': '+2', 'DIV': '-2', 'SQR': '+3', 'SQRT': '-3', 'EQL': '+4', 'NEQ': '-4', 'GTEQ': '+5', 'LT': '-5', 'RDAR':'+6', 'WTAR':'-6', 'ITJP':'+7', 'READ':'+8', 'WRIT':'-8', 'STOP':'+9'}
 
 
 
-    #Here we get started with program_memory
+    #Here we get started with program_memory, I fetch and decode instructions
     program_counter = 0
     while(True):
         if program_counter >= (len(program_memory)):
             break
         op, opn1, opn2, opn3 = parse_operation(program_memory[program_counter])
-        # print("{}   {}   {}   {}".format(op, opn1, opn2, opn3))
         if(op in ['ASGN', 'ADD', 'SUB', 'MULT', 'DIV', 'SQR', 'SQRT','RDAR', 'WTAR', 'READ', 'WRIT', 'STOP']):
             pcl_command = operations_dict[op] + ' ' + symbol_or_variable(opn1) +  ' ' + symbol_or_variable(opn2) + ' ' + symbol_or_variable(opn3)
             print(pcl_command)
@@ -129,9 +128,6 @@ if __name__ == "__main__":
             print('operation doesn\'t exist @ {} {}'.format(program_counter, op))
             sys.exit()
         program_counter += 1
-
     print("+9 999 999 999")
     for i in input_memory:
         print(i)
-    # print(symbols_and_constants_values)
-# Find all numbers, Add Them to Data Memory & const_dictionary, Add reads in the beginning of program memory

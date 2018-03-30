@@ -13,7 +13,7 @@ def VerifySyntax_LBL(token):
     else:
         print('Error: Wrong Syntax {}. Check Documentation'.format(token))
         sys.exit()
-#function to Check
+#function to Check Operands syntax
 def VerifySyntax_OPD(token):
     if( token.isalnum() and token.isupper() and token[0].isalpha()) or token.isnumeric() or (token[:1]=='-' and token[1:].isnumeric()):
         return
@@ -32,6 +32,7 @@ def truncate(variable):
     variable = trunc*(abs(variable)%(10**10))
     return variable
 
+#function that returns value from either a numeric or a symbol
 def symbol_or_variable(opn):
     if opn.isnumeric() or (opn[:1]=='-' and opn[1:].isnumeric()):
         return int(opn)
@@ -41,10 +42,12 @@ def symbol_or_variable(opn):
         else:
             print("{} was not defined".format(opn))
 
+#function to format the lines by removing spaces
 def clean_line(line):
     line  = ''.join(line.split())
     return str(line)
 
+#function that takes a full operation then returns the tokens
 def parse_operation(operation):
     op = str(operation[5:9]).rstrip()
     VerifySyntax_LBL(op)
@@ -56,7 +59,7 @@ def parse_operation(operation):
     VerifySyntax_OPD(opn3)
     return op,opn1,opn2,opn3
 
-#functions tested
+#Instruction Set
 def ADD(opn1,opn2,opn3,program_counter,input_pointer):
     opn1 = symbol_or_variable(opn1)
     opn2 = symbol_or_variable(opn2)
@@ -194,10 +197,8 @@ def ITJP(opn1,opn2,opn3,program_counter,input_pointer):
 
 
 def STOP(opn1,opn2,opn3,program_counter,input_pointer):
-    print("System Stopped")
     sys.exit()
 
-#functions being tested
 
 def RDAR(opn1,opn2,opn3,program_counter,input_pointer):
     opn2 = symbol_or_variable(opn2)
@@ -213,10 +214,8 @@ def WTAR(opn1,opn2,opn3,program_counter,input_pointer):
 
 
 
-
-
 if __name__ == "__main__":
-    # sys.stdout = open('output.txt', 'w')
+    sys.stdout = open('outputAL.txt', 'w')
     data_memory = []
     program_memory = []
     memory_dict = {0: data_memory, 1: program_memory, 2: input_memory}
@@ -226,6 +225,8 @@ if __name__ == "__main__":
     data_declarated_size =0
     program_counter = 0
     input_pointer = 0
+    operations_dict = {'ASGN': ASGN, 'ADD': ADD, 'SUB': SUB, 'MULT': MULT, 'DIV': DIV, 'SQR': SQR, 'SQRT': SQRT, 'EQL': EQL, 'NEQ': NEQ, 'GTEQ': GTEQ, 'LT': LT, 'RDAR':RDAR, 'WTAR':WTAR, 'ITJP':ITJP, 'READ':READ, 'WRIT':WRIT, 'STOP':STOP}
+
     with open('tested/tested4.txt') as f:
         for line in f:
             counter += 1
@@ -263,7 +264,6 @@ if __name__ == "__main__":
         else:
             print("Machine restrictions were not respected. {} variables declared".format(data_declarated_size))
             sys.exit()
-    # print(symbol_table)
 
 
 
@@ -274,13 +274,6 @@ if __name__ == "__main__":
             VerifySyntax_LBL(str(line[0:4]).rstrip())
             label_table[str(line[0:4]).rstrip()]=program_counter
         program_counter += 1
-    # print(label_table)
-
-
-
-
-    operations_dict = {'ASGN': ASGN, 'ADD': ADD, 'SUB': SUB, 'MULT': MULT, 'DIV': DIV, 'SQR': SQR, 'SQRT': SQRT, 'EQL': EQL, 'NEQ': NEQ, 'GTEQ': GTEQ, 'LT': LT, 'RDAR':RDAR, 'WTAR':WTAR, 'ITJP':ITJP, 'READ':READ, 'WRIT':WRIT, 'STOP':STOP}
-
 
 
     #Here we get started with program_memory
@@ -289,7 +282,6 @@ if __name__ == "__main__":
         if program_counter >= (len(program_memory)):
             break
         op, opn1, opn2, opn3 = parse_operation(program_memory[program_counter])
-        # print("{}   {}   {}   {}".format(op, opn1, opn2, opn3))
         if(op in operations_dict):
             program_counter,input_pointer = operations_dict[op](opn1,opn2,opn3,program_counter,input_pointer)
         else:
@@ -298,18 +290,3 @@ if __name__ == "__main__":
         if(op in ['EQL', 'NEQ', 'GTEQ', 'LT', 'ITJP']): # in case of branching, continue so the program counter is not incremented
             continue
         program_counter += 1
-
-
-
-
-
-
-
-    # for x in data_memory:
-    #     print(x)
-    # print('#######')
-    # for x in program_memory:
-    #     print(x)
-    # print('#######')
-    # for x in input_memory:
-    #     print(x)
