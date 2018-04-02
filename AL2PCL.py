@@ -52,7 +52,7 @@ if __name__ == "__main__":
     input_pointer = 0
 
     #Getting data_memory, program_memory and input_memory
-    with open('tested/tested4.txt') as f:
+    with open('ALfiles/AL4.txt') as f:
         for line in f:
             counter += 1
             #the next 2 lines handle comments
@@ -131,3 +131,5 @@ if __name__ == "__main__":
     print("+9 999 999 999")
     for i in input_memory:
         print(i)
+    sys.stdout = open('symbols&constants.txt', 'w')
+    print (*symbols_and_constants_values)

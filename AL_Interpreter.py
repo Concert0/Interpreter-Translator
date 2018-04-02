@@ -227,7 +227,7 @@ if __name__ == "__main__":
     input_pointer = 0
     operations_dict = {'ASGN': ASGN, 'ADD': ADD, 'SUB': SUB, 'MULT': MULT, 'DIV': DIV, 'SQR': SQR, 'SQRT': SQRT, 'EQL': EQL, 'NEQ': NEQ, 'GTEQ': GTEQ, 'LT': LT, 'RDAR':RDAR, 'WTAR':WTAR, 'ITJP':ITJP, 'READ':READ, 'WRIT':WRIT, 'STOP':STOP}
 
-    with open('tested/tested4.txt') as f:
+    with open('ALfiles/AL4.txt') as f:
         for line in f:
             counter += 1
             #the next 2 lines handle comments

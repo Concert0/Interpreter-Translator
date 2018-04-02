@@ -2,6 +2,7 @@
 #Python 3.6.4
 import sys
 import math
+import ast
 input_memory = []
 
 #function to format the lines by removing spaces
@@ -155,6 +156,14 @@ def WTAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     return data_memory,program_counter,input_pointer
 
 if __name__ == "__main__":
+    #This list contains all the constants and values of the variables
+    #In case of interpreting PCL without translation form AL(no values for variable and constants), replace mylist by data memory
+    mylist = []
+    with open('symbols&constants.txt', 'r') as fiile:
+        line = fiile.readline()
+        for u in line.split():
+            mylist.append(int(u))
+
     sys.stdout = open('outputPCL.txt', 'w')
     data_memory = []
     program_memory = []
@@ -182,12 +191,13 @@ if __name__ == "__main__":
     #fill the rest of data memory with 0s
     while(len(data_memory)<=1000):
         data_memory.append(0)
-
+    #in case of running PCL with no
 #Execute the instructions
     while(True):
         op, opn1, opn2, opn3 = parse_operation(program_memory[program_counter])
+        # print("{}   {}   {}   {}   ".format(op, opn1, opn2, opn3))
         if(op in operations_dict):
-            data_memory,program_counter,input_pointer = operations_dict[op](data_memory,opn1,opn2,opn3,program_counter,input_pointer)
+            mylist,program_counter,input_pointer = operations_dict[op](mylist,opn1,opn2,opn3,program_counter,input_pointer)
         else:
             print('operation doesn\'t exist @ {} {}'.format(program_counter, op))
             sys.exit()
