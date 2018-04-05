@@ -156,6 +156,7 @@ def WTAR(data_memory,opn1,opn2,opn3,program_counter,input_pointer):
     return data_memory,program_counter,input_pointer
 
 if __name__ == "__main__":
+    sys.stdout = open('outputPCL.txt', 'w')
     data_memory = []
     program_memory = []
     memory_dict = {0: data_memory, 1: program_memory, 2: input_memory}
