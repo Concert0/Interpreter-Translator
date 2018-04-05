@@ -81,7 +81,7 @@ if __name__ == "__main__":
                 temp = int(line[15:26].rstrip())
             symbols_and_constants_values.append(temp)
             counter += 1
-            print('+0 000 000 000')
+            # print('+0 000 000 000')
         else:
             symbol_table[str(line[5:9].rstrip())]= "{0:0>3}".format(counter)
             for i in range(int(line[10:14])):
@@ -89,13 +89,15 @@ if __name__ == "__main__":
                 #Assumption based on all the examples we've seen so far
                 counter+= 1
                 symbols_and_constants_values.append(0)
-                print('+0 000 000 000')
+                # print('+0 000 000 000')
 #Always check if the machine restrictions are respected, 1000 words for data and another 1000 words for program
         if data_declarated_size>1000:
             print("Machine restrictions were not respected. {} variables declared".format(data_declarated_size))
             sys.exit()
         data_declarated_size += int(line[10:14])
-    print("+9 999 999 999")
+    # print("+9 999 999 999")
+
+
 
 
     ##Looking for labels and adding them to the label table
@@ -110,17 +112,20 @@ if __name__ == "__main__":
 
     #Here we get started with program_memory, I fetch and decode instructions
     program_counter = 0
+    pcl_commands = []
     while(True):
         if program_counter >= (len(program_memory)):
             break
         op, opn1, opn2, opn3 = parse_operation(program_memory[program_counter])
         if(op in ['ASGN', 'ADD', 'SUB', 'MULT', 'DIV', 'SQR', 'SQRT','RDAR', 'WTAR', 'READ', 'WRIT', 'STOP']):
             pcl_command = operations_dict[op] + ' ' + symbol_or_variable(opn1) +  ' ' + symbol_or_variable(opn2) + ' ' + symbol_or_variable(opn3)
-            print(pcl_command)
+            # print(pcl_command)
+            pcl_commands.append(pcl_command)
         elif(op in ['EQL', 'NEQ', 'GTEQ', 'LT','ITJP']):
             if(opn3 in label_table):
                 pcl_command = operations_dict[op] + ' ' + symbol_or_variable(opn1) +' ' + symbol_or_variable(opn2) + ' ' + label_table[opn3]
-                print(pcl_command)
+                # print(pcl_command)
+                pcl_commands.append(pcl_command)
             else:
                 print("Error: Label not found")
                 sys.exit()
@@ -128,8 +133,26 @@ if __name__ == "__main__":
             print('operation doesn\'t exist @ {} {}'.format(program_counter, op))
             sys.exit()
         program_counter += 1
+
+
+    #Printing data_memory
+    for i in symbols_and_constants_values:
+        temp = ''
+        if(i>=0):
+            temp = '+' + "{0:0>10}".format(i)
+        else:
+            temp = '-' + "{0:0>10}".format(abs(i))
+        temp = temp[:2] + ' ' + temp[2:5] + ' ' + temp[5:8] + ' ' + temp[8:11]
+        print(temp)
+    print("+9 999 999 999")
+
+
+    #printing program_memory
+    for i in pcl_commands:
+        print(i)
+
+
+    #Printing Input
     print("+9 999 999 999")
     for i in input_memory:
         print(i)
-    sys.stdout = open('symbols&constants.txt', 'w')
-    print (*symbols_and_constants_values)
